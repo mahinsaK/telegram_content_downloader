@@ -35,6 +35,16 @@ cp .env.example .env
 # then edit .env and set TELEGRAM_API_ID, TELEGRAM_API_HASH, TELEGRAM_PHONE
 ```
 
+### How to get `TELEGRAM_API_ID` and `TELEGRAM_API_HASH`
+
+1. Open https://my.telegram.org in a browser and sign in with your Telegram phone number.
+2. Click "API development tools" (or "Create new application").
+3. Enter an application title and short name (URL and platform fields are optional) and submit.
+4. After creation you'll see the numeric `api_id` and the `api_hash` string — copy those values.
+5. Add them to your local `.env` as `TELEGRAM_API_ID` and `TELEGRAM_API_HASH`. Keep `api_hash` secret and do not commit it to source control.
+
+Note: you will also need to authenticate with your phone number the first time you run the scripts; Telethon will send a login code to that number and then store an authenticated session file locally.
+
 ## Run
 
 Run the script you want:
