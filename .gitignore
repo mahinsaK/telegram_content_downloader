@@ -3,3 +3,8 @@
 __pycache__/
 *.pyc
 notes.txt
+.DS_Store
+downloader_session.session
+*.session
+Videos/
+PDFs/
