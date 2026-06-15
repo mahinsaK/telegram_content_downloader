@@ -1,4 +1,5 @@
 import asyncio
+import mimetypes
 import os
 import re
 from pathlib import Path
@@ -28,6 +29,7 @@ def load_telegram_config():
 def ensure_output_folders():
     os.makedirs("Videos", exist_ok=True)
     os.makedirs("PDFs", exist_ok=True)
+    os.makedirs("Images", exist_ok=True)
 
 
 def parse_telegram_link(link_clean):
@@ -41,7 +43,30 @@ def get_download_target(message):
     if message.file and message.file.name:
         filename = message.file.name
     else:
-        ext = "mp4" if message.video else "pdf" if message.document else "bin"
+        mime_type = getattr(message.file, "mime_type", None) if message.file else None
+        if message.photo:
+            ext = "jpg"
+        elif mime_type:
+            guessed = mimetypes.guess_extension(mime_type)
+            if guessed:
+                ext = guessed.lstrip(".")
+            elif mime_type.startswith("image/"):
+                subtype = mime_type.split("/", 1)[1]
+                ext = "jpg" if subtype == "jpeg" else subtype
+            elif mime_type == "application/pdf":
+                ext = "pdf"
+            elif mime_type.startswith("video/"):
+                ext = "mp4"
+            elif message.video:
+                ext = "mp4"
+            else:
+                ext = "bin"
+        elif message.video:
+            ext = "mp4"
+        elif message.document:
+            ext = "pdf"
+        else:
+            ext = "bin"
         filename = f"telegram_{message.id}.{ext}"
 
     if message.video or (
@@ -49,7 +74,11 @@ def get_download_target(message):
         and any(isinstance(attr, DocumentAttributeVideo) for attr in message.document.attributes)
     ):
         folder = "Videos"
-    elif message.document and filename.lower().endswith(".pdf"):
+    elif message.photo or (
+        message.file and message.file.mime_type and message.file.mime_type.startswith("image/")
+    ):
+        folder = "Images"
+    elif message.file and message.file.mime_type == "application/pdf":
         folder = "PDFs"
     else:
         folder = "."
