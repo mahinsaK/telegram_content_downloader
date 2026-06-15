@@ -5,6 +5,7 @@ __pycache__/
 notes.txt
 .DS_Store
 downloader_session.session
+*.session-journal
 *.session
 Videos/
 PDFs/
